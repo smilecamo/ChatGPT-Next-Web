@@ -19,4 +19,4 @@ RUN npm run build
 RUN npm install pm2 -g
 
 # 启动PM2和Next.js应用
-CMD ["pm2-runtime", "start", "ecosystem.config.js"]
+CMD ["npm", "run", "pro"]
