@@ -8,6 +8,9 @@ module.exports = {
       exec_mode: "cluster", // 执行模式为集群
       restart_delay: 5000, // 在重启前延迟 5 秒
       max_restarts: 5, // 最多重启 5 次
+      env: {
+        PM2_SERVE_PORT: 3080,
+      },
     },
   ],
 };

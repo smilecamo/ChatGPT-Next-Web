@@ -9,7 +9,7 @@
     "build": "yarn mask && cross-env BUILD_MODE=standalone next build",
     "start": "next start",
     "lint": "next lint",
-    "pro": "pm2-runtime start ecosystem.config.js",
+    "pro": "yarn && yarn build && pm2-runtime start ecosystem.config.js",
     "pro:list": "pm2-runtime list",
     "pro:delete": "pm2-runtime delete chatgpt-next-web",
     "export": "yarn mask && cross-env BUILD_MODE=export BUILD_APP=1 next build",
