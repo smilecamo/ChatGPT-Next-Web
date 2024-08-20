@@ -1,6 +1,6 @@
 import { getServerSideConfig } from "@/app/config/server";
 import {
-  Deepseek,
+  DeepSeek,
   DEEPSEEK_BASE_URL,
   ApiPath,
   ModelProvider,
@@ -18,13 +18,17 @@ export async function handle(
   req: NextRequest,
   { params }: { params: { path: string[] } },
 ) {
-  console.log("[Deepseek Route] params ", params);
+  console.log("[DeepSeek Route] params ", params);
 
   if (req.method === "OPTIONS") {
     return NextResponse.json({ body: "OK" }, { status: 200 });
   }
 
-  const authResult = auth(req, ModelProvider.Deepseek);
+  const authResult = auth(req, ModelProvider.DeepSeek);
+  console.log("[000000000000000000000000000DeepSeek] ", ModelProvider.DeepSeek);
+
+  console.log("[DeepSeek] ", authResult);
+
   if (authResult.error) {
     return NextResponse.json(authResult, {
       status: 401,
@@ -33,23 +37,21 @@ export async function handle(
 
   try {
     const response = await request(req);
-    console.log("我是从api这边进入的2", response);
     return response;
   } catch (e) {
-    console.error("[Deepseek] ", e);
+    console.error("[DeepSeek] ", e);
     return NextResponse.json(prettyObject(e));
   }
 }
 
 async function request(req: NextRequest) {
   const controller = new AbortController();
-  console.log("我是从api这边进入的", req.nextUrl.pathname);
 
   // alibaba use base url or just remove the path
-  let path = `${req.nextUrl.pathname}`.replaceAll(ApiPath.Deepseek, "");
-  console.log("req.nextUrl.pathname", `${req.nextUrl.pathname}`);
+  let path = `${req.nextUrl.pathname}`.replaceAll(ApiPath.DeepSeek, "");
 
-  let baseUrl = serverConfig.deepseekApiUrl || DEEPSEEK_BASE_URL;
+  let baseUrl = serverConfig.deepseekUrl || DEEPSEEK_BASE_URL;
+  console.log("DEEPSEEK baseUrl", baseUrl);
 
   if (!baseUrl.startsWith("http")) {
     baseUrl = `https://${baseUrl}`;
@@ -59,8 +61,8 @@ async function request(req: NextRequest) {
     baseUrl = baseUrl.slice(0, -1);
   }
 
-  console.log("[Deepseek Proxy] ", path);
-  console.log("[Deepseek Base Url]", baseUrl);
+  console.log("[Proxy] ", path);
+  console.log("[Base Url]", baseUrl);
 
   const timeoutId = setTimeout(
     () => {
@@ -74,7 +76,6 @@ async function request(req: NextRequest) {
     headers: {
       "Content-Type": "application/json",
       Authorization: req.headers.get("Authorization") ?? "",
-      "X-DashScope-SSE": req.headers.get("X-DashScope-SSE") ?? "disable",
     },
     method: req.method,
     body: req.body,
@@ -97,7 +98,7 @@ async function request(req: NextRequest) {
         isModelAvailableInServer(
           serverConfig.customModels,
           jsonBody?.model as string,
-          ServiceProvider.Deepseek as string,
+          ServiceProvider.Moonshot as string,
         )
       ) {
         return NextResponse.json(
@@ -111,7 +112,7 @@ async function request(req: NextRequest) {
         );
       }
     } catch (e) {
-      console.error(`[Deepseek] filter`, e);
+      console.error(`[Moonshot] filter`, e);
     }
   }
   try {

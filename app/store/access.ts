@@ -39,10 +39,6 @@ const DEFAULT_ALIBABA_URL = isApp
   ? DEFAULT_API_HOST + "/api/proxy/alibaba"
   : ApiPath.Alibaba;
 
-const DEFAULT_DEEPSEEK_URL = isApp
-  ? DEFAULT_API_HOST + "/api/proxy/deepseek"
-  : ApiPath.Deepseek;
-
 const DEFAULT_TENCENT_URL = isApp
   ? DEFAULT_API_HOST + "/api/proxy/tencent"
   : ApiPath.Tencent;
@@ -50,6 +46,10 @@ const DEFAULT_TENCENT_URL = isApp
 const DEFAULT_MOONSHOT_URL = isApp
   ? DEFAULT_API_HOST + "/api/proxy/moonshot"
   : ApiPath.Moonshot;
+
+const DEFAULT_DEEPSEEK_URL = isApp
+  ? DEFAULT_API_HOST + "/api/proxy/deepseek"
+  : ApiPath.DeepSeek;
 
 const DEFAULT_STABILITY_URL = isApp
   ? DEFAULT_API_HOST + "/api/proxy/stability"
@@ -97,12 +97,13 @@ const DEFAULT_ACCESS_STATE = {
   // alibaba
   alibabaUrl: DEFAULT_ALIBABA_URL,
   alibabaApiKey: "",
-  // DEEPSEEK
-  deepseekUrl: DEFAULT_DEEPSEEK_URL,
-  deepseekApiKey: "",
+
   // moonshot
   moonshotUrl: DEFAULT_MOONSHOT_URL,
   moonshotApiKey: "",
+  // deepseek
+  deepseekUrl: DEFAULT_DEEPSEEK_URL,
+  deepseekApiKey: "",
 
   //stability
   stabilityUrl: DEFAULT_STABILITY_URL,
@@ -165,9 +166,6 @@ export const useAccessStore = createPersistStore(
     isValidAlibaba() {
       return ensure(get(), ["alibabaApiKey"]);
     },
-    isValidDeepseekApiKey() {
-      return ensure(get(), ["deepseekApiKey"]);
-    },
 
     isValidTencent() {
       return ensure(get(), ["tencentSecretKey", "tencentSecretId"]);
@@ -175,6 +173,9 @@ export const useAccessStore = createPersistStore(
 
     isValidMoonshot() {
       return ensure(get(), ["moonshotApiKey"]);
+    },
+    isValidDeepseek() {
+      return ensure(get(), ["deepseekApiKey"]);
     },
     isValidIflytek() {
       return ensure(get(), ["iflytekApiKey"]);
@@ -192,8 +193,7 @@ export const useAccessStore = createPersistStore(
         this.isValidBaidu() ||
         this.isValidByteDance() ||
         this.isValidAlibaba() ||
-        this.isValidDeepseekApiKey() ||
-        this.isValidTencent ||
+        this.isValidTencent() ||
         this.isValidMoonshot() ||
         this.isValidIflytek() ||
         !this.enabledAccessControl() ||

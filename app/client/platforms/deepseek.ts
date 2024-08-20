@@ -1,7 +1,7 @@
 "use client";
 import {
   ApiPath,
-  Deepseek,
+  DeepSeek,
   DEEPSEEK_BASE_URL,
   REQUEST_TIMEOUT_MS,
 } from "@/app/constant";
@@ -31,12 +31,10 @@ export interface OpenAIListModelResponse {
     root: string;
   }>;
 }
-
-interface RequestInput {
+interface messages {
   role: "system" | "user" | "assistant";
   content: string | MultimodalContent[];
 }
-[];
 interface RequestParam {
   result_format: string;
   incremental_output?: boolean;
@@ -47,8 +45,9 @@ interface RequestParam {
 }
 interface RequestPayload {
   model: string;
-  messages: RequestInput[];
-  stream?: Boolean;
+  messages: messages[];
+  stream: boolean;
+  parameters: RequestParam;
 }
 
 export class DeepseekApi implements LLMApi {
@@ -63,13 +62,13 @@ export class DeepseekApi implements LLMApi {
 
     if (baseUrl.length === 0) {
       const isApp = !!getClientConfig()?.isApp;
-      baseUrl = isApp ? DEEPSEEK_BASE_URL : ApiPath.Deepseek;
+      baseUrl = isApp ? DEEPSEEK_BASE_URL : ApiPath.DeepSeek;
     }
 
     if (baseUrl.endsWith("/")) {
       baseUrl = baseUrl.slice(0, baseUrl.length - 1);
     }
-    if (!baseUrl.startsWith("http") && !baseUrl.startsWith(ApiPath.Deepseek)) {
+    if (!baseUrl.startsWith("http") && !baseUrl.startsWith(ApiPath.DeepSeek)) {
       baseUrl = "https://" + baseUrl;
     }
 
@@ -79,11 +78,11 @@ export class DeepseekApi implements LLMApi {
   }
 
   extractMessage(res: any) {
-    return res?.choices?.at(0)?.message?.content ?? "";
+    return res?.output?.choices?.at(0)?.message?.content ?? "";
   }
 
   async chat(options: ChatOptions) {
-    const messages: RequestInput[] = options.messages.map((v) => ({
+    const messages = options.messages.map((v) => ({
       role: v.role,
       content: getMessageTextContent(v),
     }));
@@ -97,24 +96,31 @@ export class DeepseekApi implements LLMApi {
     };
 
     const shouldStream = !!options.config.stream;
-    // const shouldStream = false;
     const requestPayload: RequestPayload = {
       model: modelConfig.model,
       messages,
       stream: shouldStream,
+      parameters: {
+        result_format: "message",
+        incremental_output: shouldStream,
+        temperature: modelConfig.temperature,
+        // max_tokens: modelConfig.max_tokens,
+        top_p: modelConfig.top_p === 1 ? 0.99 : modelConfig.top_p, // qwen top_p is should be < 1
+      },
     };
 
     const controller = new AbortController();
     options.onController?.(controller);
 
     try {
-      const chatPath = this.path(Deepseek.ChatPath);
+      const chatPath = this.path(DeepSeek.ChatPath);
       const chatPayload = {
         method: "POST",
         body: JSON.stringify(requestPayload),
         signal: controller.signal,
         headers: {
           ...getHeaders(),
+          "X-DashScope-SSE": shouldStream ? "enable" : "disable",
         },
       };
 
@@ -169,7 +175,7 @@ export class DeepseekApi implements LLMApi {
             clearTimeout(requestTimeoutId);
             const contentType = res.headers.get("content-type");
             console.log(
-              "[Deepseek] request response content type: ",
+              "[DeepSeek] request response content type: ",
               contentType,
             );
 
@@ -206,14 +212,12 @@ export class DeepseekApi implements LLMApi {
             }
           },
           onmessage(msg) {
-            // console.log("msg", msg);
             if (msg.data === "[DONE]" || finished) {
               return finish();
             }
             const text = msg.data;
             try {
               const json = JSON.parse(text);
-              // console.log("json", json);
 
               const choices = json.choices as Array<{
                 delta: { content: string };
@@ -237,9 +241,11 @@ export class DeepseekApi implements LLMApi {
         });
       } else {
         const res = await fetch(chatPath, chatPayload);
+        console.log(res);
+
         clearTimeout(requestTimeoutId);
+
         const resJson = await res.json();
-        console.log("resJson", resJson);
         const message = this.extractMessage(resJson);
         options.onFinish(message);
       }
@@ -259,4 +265,4 @@ export class DeepseekApi implements LLMApi {
     return [];
   }
 }
-export { Deepseek };
+export { DeepSeek };

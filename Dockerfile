@@ -1,22 +1,64 @@
-FROM node:20
+FROM node:18-alpine AS base
 
-# 创建工作目录
-WORKDIR /usr/src/app
+FROM base AS deps
 
-# 复制package.json和package-lock.json文件
-COPY package*.json ./
+RUN apk add --no-cache libc6-compat
 
-# 安装依赖
-RUN npm install
+WORKDIR /app
 
-# 复制项目文件
+COPY package.json yarn.lock ./
+
+RUN yarn config set registry 'https://registry.npmmirror.com/'
+RUN yarn install
+
+FROM base AS builder
+
+RUN apk update && apk add --no-cache git
+
+ENV OPENAI_API_KEY=""
+ENV GOOGLE_API_KEY=""
+ENV CODE=""
+
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# 构建Next.js应用
-RUN npm run build
+RUN yarn build
 
-# 安装PM2
-RUN npm install pm2 -g
+FROM base AS runner
+WORKDIR /app
 
-# 启动PM2和Next.js应用
-CMD ["npm", "run", "pro"]
+RUN apk add proxychains-ng
+
+ENV PROXY_URL=""
+ENV OPENAI_API_KEY=""
+ENV GOOGLE_API_KEY=""
+ENV CODE=""
+
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/.next/server ./.next/server
+
+EXPOSE 3000
+
+CMD if [ -n "$PROXY_URL" ]; then \
+    export HOSTNAME="0.0.0.0"; \
+    protocol=$(echo $PROXY_URL | cut -d: -f1); \
+    host=$(echo $PROXY_URL | cut -d/ -f3 | cut -d: -f1); \
+    port=$(echo $PROXY_URL | cut -d: -f3); \
+    conf=/etc/proxychains.conf; \
+    echo "strict_chain" > $conf; \
+    echo "proxy_dns" >> $conf; \
+    echo "remote_dns_subnet 224" >> $conf; \
+    echo "tcp_read_time_out 15000" >> $conf; \
+    echo "tcp_connect_time_out 8000" >> $conf; \
+    echo "localnet 127.0.0.0/255.0.0.0" >> $conf; \
+    echo "localnet ::1/128" >> $conf; \
+    echo "[ProxyList]" >> $conf; \
+    echo "$protocol $host $port" >> $conf; \
+    cat /etc/proxychains.conf; \
+    proxychains -f $conf node server.js; \
+    else \
+    node server.js; \
+    fi

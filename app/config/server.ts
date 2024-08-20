@@ -1,5 +1,5 @@
 import md5 from "spark-md5";
-import { DEFAULT_MODELS } from "../constant";
+import { DEFAULT_MODELS, DEFAULT_GA_ID } from "../constant";
 
 declare global {
   namespace NodeJS {
@@ -56,9 +56,11 @@ declare global {
       // alibaba only
       ALIBABA_URL?: string;
       ALIBABA_API_KEY?: string;
-      // deepseek only
-      DEEPSEEK_API_KEY?: string;
+
+      //  DEEPSEEK only
       DEEPSEEK_URL?: string;
+      DEEPSEEK_API_KEY?: string;
+
       // tencent only
       TENCENT_URL?: string;
       TENCENT_SECRET_KEY?: string;
@@ -157,7 +159,6 @@ export const getServerSideConfig = () => {
   const allowedWebDevEndpoints = (
     process.env.WHITE_WEBDEV_ENDPOINTS ?? ""
   ).split(",");
-
   return {
     baseUrl: process.env.BASE_URL,
     apiKey: getApiKey(process.env.OPENAI_API_KEY),
@@ -195,8 +196,8 @@ export const getServerSideConfig = () => {
     alibabaApiKey: getApiKey(process.env.ALIBABA_API_KEY),
 
     isDeepseek,
+    deepseekUrl: process.env.DEEPSEEK_URL,
     deepseekApiKey: getApiKey(process.env.DEEPSEEK_API_KEY),
-    deepseekApiUrl: process.env.DEEPSEEK_URL,
 
     isTencent,
     tencentUrl: process.env.TENCENT_URL,
@@ -218,6 +219,7 @@ export const getServerSideConfig = () => {
     cloudflareKVTTL: process.env.CLOUDFLARE_KV_TTL,
 
     gtmId: process.env.GTM_ID,
+    gaId: process.env.GA_ID || DEFAULT_GA_ID,
 
     needCode: ACCESS_CODES.size > 0,
     code: process.env.CODE,

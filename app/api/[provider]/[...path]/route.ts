@@ -10,11 +10,14 @@ import { handle as alibabaHandler } from "../../alibaba";
 import { handle as moonshotHandler } from "../../moonshot";
 import { handle as stabilityHandler } from "../../stability";
 import { handle as iflytekHandler } from "../../iflytek";
+import { handle as deepseekHandler } from "../../deepseek";
 async function handle(
   req: NextRequest,
   { params }: { params: { provider: string; path: string[] } },
 ) {
   const apiPath = `/api/${params.provider}`;
+  console.log("1111111111apiPath", apiPath);
+
   console.log(`[${params.provider} Route] params `, params);
   switch (apiPath) {
     case ApiPath.Azure:
@@ -32,6 +35,8 @@ async function handle(
     // case ApiPath.Tencent: using "/api/tencent"
     case ApiPath.Moonshot:
       return moonshotHandler(req, { params });
+    case ApiPath.DeepSeek:
+      return deepseekHandler(req, { params });
     case ApiPath.Stability:
       return stabilityHandler(req, { params });
     case ApiPath.Iflytek:

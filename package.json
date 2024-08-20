@@ -1,5 +1,5 @@
 {
-  "name": "111",
+  "name": "nextchat",
   "private": false,
   "license": "mit",
   "scripts": {
@@ -9,9 +9,9 @@
     "build": "yarn mask && cross-env BUILD_MODE=standalone next build",
     "start": "next start",
     "lint": "next lint",
-    "pro": "yarn && yarn build && pm2-runtime start ecosystem.config.js",
-    "pro:list": "pm2-runtime list",
-    "pro:delete": "pm2-runtime delete chatgpt-next-web",
+    "pro": "yarn && yarn build && pm2 start ecosystem.config.js",
+    "pro:list": "pm2 list",
+    "pro:delete": "pm2 delete chatgpt-next-web",
     "export": "yarn mask && cross-env BUILD_MODE=export BUILD_APP=1 next build",
     "export:dev": "concurrently -r \"yarn mask:watch\"  \"cross-env BUILD_MODE=export BUILD_APP=1 next dev\"",
     "app:dev": "concurrently -r \"yarn mask:watch\" \"yarn tauri dev\"",

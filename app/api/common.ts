@@ -97,8 +97,6 @@ export async function requestOpenai(req: NextRequest) {
   }
 
   const fetchUrl = cloudflareAIGatewayUrl(`${baseUrl}/${path}`);
-  console.log("baseUrl", baseUrl);
-  console.log("path", path);
   console.log("fetchUrl", fetchUrl);
   const fetchOptions: RequestInit = {
     headers: {

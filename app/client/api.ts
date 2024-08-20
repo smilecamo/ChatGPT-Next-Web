@@ -12,9 +12,9 @@ import { ClaudeApi } from "./platforms/anthropic";
 import { ErnieApi } from "./platforms/baidu";
 import { DoubaoApi } from "./platforms/bytedance";
 import { QwenApi } from "./platforms/alibaba";
-import { DeepseekApi } from "./platforms/deepseek";
 import { HunyuanApi } from "./platforms/tencent";
 import { MoonshotApi } from "./platforms/moonshot";
+import { DeepseekApi } from "./platforms/deepseek";
 import { SparkApi } from "./platforms/iflytek";
 
 export const ROLES = ["system", "user", "assistant"] as const;
@@ -110,6 +110,8 @@ export class ClientApi {
   public llm: LLMApi;
 
   constructor(provider: ModelProvider = ModelProvider.GPT) {
+    console.log("init api with provider: ", provider);
+
     switch (provider) {
       case ModelProvider.GeminiPro:
         this.llm = new GeminiProApi();
@@ -126,14 +128,14 @@ export class ClientApi {
       case ModelProvider.Qwen:
         this.llm = new QwenApi();
         break;
-      case ModelProvider.Deepseek:
-        this.llm = new DeepseekApi();
-        break;
       case ModelProvider.Hunyuan:
         this.llm = new HunyuanApi();
         break;
       case ModelProvider.Moonshot:
         this.llm = new MoonshotApi();
+        break;
+      case ModelProvider.DeepSeek:
+        this.llm = new DeepseekApi();
         break;
       case ModelProvider.Iflytek:
         this.llm = new SparkApi();
@@ -159,7 +161,7 @@ export class ClientApi {
         {
           from: "human",
           value:
-            "Share from [清明上河图小助手]: https://github.com/Yidadaa/ChatGPT-Next-Web",
+            "Share from [NextChat]: https://github.com/Yidadaa/ChatGPT-Next-Web",
         },
       ]);
     // 敬告二开开发者们，为了开源大模型的发展，请不要修改上述消息，此消息用于后续数据清洗使用
@@ -220,9 +222,8 @@ export function getHeaders() {
     const isBaidu = modelConfig.providerName == ServiceProvider.Baidu;
     const isByteDance = modelConfig.providerName === ServiceProvider.ByteDance;
     const isAlibaba = modelConfig.providerName === ServiceProvider.Alibaba;
-    const isDeepseek = modelConfig.providerName === ServiceProvider.Deepseek;
-
     const isMoonshot = modelConfig.providerName === ServiceProvider.Moonshot;
+    const isDeepseek = modelConfig.providerName === ServiceProvider.DeepSeek;
     const isIflytek = modelConfig.providerName === ServiceProvider.Iflytek;
     const isEnabledAccessControl = accessStore.enabledAccessControl();
     const apiKey = isGoogle
@@ -235,10 +236,10 @@ export function getHeaders() {
       ? accessStore.bytedanceApiKey
       : isAlibaba
       ? accessStore.alibabaApiKey
-      : isDeepseek
-      ? accessStore.deepseekApiKey
       : isMoonshot
       ? accessStore.moonshotApiKey
+      : isDeepseek
+      ? accessStore.deepseekApiKey
       : isIflytek
       ? accessStore.iflytekApiKey && accessStore.iflytekApiSecret
         ? accessStore.iflytekApiKey + ":" + accessStore.iflytekApiSecret
@@ -251,8 +252,8 @@ export function getHeaders() {
       isBaidu,
       isByteDance,
       isAlibaba,
-      isDeepseek,
       isMoonshot,
+      isDeepseek,
       isIflytek,
       apiKey,
       isEnabledAccessControl,
@@ -279,9 +280,7 @@ export function getHeaders() {
   const authHeader = getAuthHeader();
 
   const bearerToken = getBearerToken(apiKey, isAzure || isAnthropic);
-  console.log("bearerToken", bearerToken);
-  // TODO: remove this 更换 Deepseek 的 api key
-  headers["Authorization"] = `Bearer sk-94ee98bc9bd14db495d49eb598b69ff0`;
+
   if (bearerToken) {
     headers[authHeader] = bearerToken;
   } else if (isEnabledAccessControl && validString(accessStore.accessCode)) {
@@ -305,12 +304,12 @@ export function getClientApi(provider: ServiceProvider): ClientApi {
       return new ClientApi(ModelProvider.Doubao);
     case ServiceProvider.Alibaba:
       return new ClientApi(ModelProvider.Qwen);
-    case ServiceProvider.Deepseek:
-      return new ClientApi(ModelProvider.Deepseek);
     case ServiceProvider.Tencent:
       return new ClientApi(ModelProvider.Hunyuan);
     case ServiceProvider.Moonshot:
       return new ClientApi(ModelProvider.Moonshot);
+    case ServiceProvider.DeepSeek:
+      return new ClientApi(ModelProvider.DeepSeek);
     case ServiceProvider.Iflytek:
       return new ClientApi(ModelProvider.Iflytek);
     default:

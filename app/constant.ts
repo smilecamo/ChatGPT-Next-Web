@@ -22,7 +22,7 @@ export const BAIDU_OATUH_URL = `${BAIDU_BASE_URL}/oauth/2.0/token`;
 export const BYTEDANCE_BASE_URL = "https://ark.cn-beijing.volces.com";
 
 export const ALIBABA_BASE_URL = "https://dashscope.aliyuncs.com/api/";
-
+export const DEEPSEEK_BASE_URL = "https://api.deepseek.com";
 export const TENCENT_BASE_URL = "https://hunyuan.tencentcloudapi.com";
 
 export const MOONSHOT_BASE_URL = "https://api.moonshot.cn";
@@ -30,7 +30,7 @@ export const IFLYTEK_BASE_URL = "https://spark-api-open.xf-yun.com";
 
 export const CACHE_URL_PREFIX = "/api/cache";
 export const UPLOAD_URL = `${CACHE_URL_PREFIX}/upload`;
-export const DEEPSEEK_BASE_URL = "https://api.deepseek.com";
+
 export enum Path {
   Home = "/",
   Chat = "/chat",
@@ -42,7 +42,7 @@ export enum Path {
   SdNew = "/sd-new",
   Artifacts = "/artifacts",
 }
-// API路径
+
 export enum ApiPath {
   Cors = "",
   Azure = "/api/azure",
@@ -54,10 +54,10 @@ export enum ApiPath {
   Alibaba = "/api/alibaba",
   Tencent = "/api/tencent",
   Moonshot = "/api/moonshot",
+  DeepSeek = "/api/deepseek",
   Iflytek = "/api/iflytek",
   Stability = "/api/stability",
   Artifacts = "/api/artifacts",
-  Deepseek = "/api/deepseek",
 }
 
 export enum SlotID {
@@ -100,7 +100,7 @@ export const STORAGE_KEY = "chatgpt-next-web";
 export const REQUEST_TIMEOUT_MS = 60000;
 
 export const EXPORT_MESSAGE_CLASS_NAME = "export-markdown";
-// 服务提供商
+
 export enum ServiceProvider {
   OpenAI = "OpenAI",
   Azure = "Azure",
@@ -111,9 +111,9 @@ export enum ServiceProvider {
   Alibaba = "Alibaba",
   Tencent = "Tencent",
   Moonshot = "Moonshot",
+  DeepSeek = "DeepSeek",
   Stability = "Stability",
   Iflytek = "Iflytek",
-  Deepseek = "Deepseek",
 }
 
 // Google API safety settings, see https://ai.google.dev/gemini-api/docs/safety-settings
@@ -125,7 +125,6 @@ export enum GoogleSafetySettingsThreshold {
   BLOCK_LOW_AND_ABOVE = "BLOCK_LOW_AND_ABOVE",
 }
 
-// 模型提供商
 export enum ModelProvider {
   Stability = "Stability",
   GPT = "GPT",
@@ -136,8 +135,8 @@ export enum ModelProvider {
   Qwen = "Qwen",
   Hunyuan = "Hunyuan",
   Moonshot = "Moonshot",
+  DeepSeek = "DeepSeek",
   Iflytek = "Iflytek",
-  Deepseek = "Deepseek",
 }
 
 export const Stability = {
@@ -204,10 +203,7 @@ export const Alibaba = {
   ExampleEndpoint: ALIBABA_BASE_URL,
   ChatPath: "v1/services/aigc/text-generation/generation",
 };
-export const Deepseek = {
-  ExampleEndpoint: DEEPSEEK_BASE_URL,
-  ChatPath: "v1/chat/completions",
-};
+
 export const Tencent = {
   ExampleEndpoint: TENCENT_BASE_URL,
 };
@@ -216,7 +212,10 @@ export const Moonshot = {
   ExampleEndpoint: MOONSHOT_BASE_URL,
   ChatPath: "v1/chat/completions",
 };
-
+export const DeepSeek = {
+  ExampleEndpoint: DEEPSEEK_BASE_URL,
+  ChatPath: "/v1/chat/completions",
+};
 export const Iflytek = {
   ExampleEndpoint: IFLYTEK_BASE_URL,
   ChatPath: "v1/chat/completions",
@@ -330,7 +329,7 @@ const alibabaModes = [
   "qwen-max-0107",
   "qwen-max-longcontext",
 ];
-const DeepseekModels = ["deepseek-chat", "deepseek-coder"];
+
 const tencentModels = [
   "hunyuan-pro",
   "hunyuan-standard",
@@ -342,6 +341,7 @@ const tencentModels = [
 ];
 
 const moonshotModes = ["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"];
+const deepseekModes = ["deepseek-chat", "deepseek-coder"];
 
 const iflytekModels = [
   "general",
@@ -452,6 +452,17 @@ export const DEFAULT_MODELS = [
       sorted: 9,
     },
   })),
+  ...deepseekModes.map((name) => ({
+    name,
+    available: true,
+    sorted: seq++,
+    provider: {
+      id: "deepseek",
+      providerName: "DeepSeek",
+      providerType: "DeepSeek",
+      sorted: 11,
+    },
+  })),
   ...iflytekModels.map((name) => ({
     name,
     available: true,
@@ -461,17 +472,6 @@ export const DEFAULT_MODELS = [
       providerName: "Iflytek",
       providerType: "iflytek",
       sorted: 10,
-    },
-  })),
-  ...DeepseekModels.map((name) => ({
-    name,
-    available: true,
-    sorted: seq++,
-    provider: {
-      id: "deepseek",
-      providerName: "Deepseek",
-      providerType: "deepseek",
-      sorted: 11,
     },
   })),
 ] as const;
@@ -492,4 +492,5 @@ export const internalAllowedWebDavEndpoints = [
   "https://app.koofr.net/dav/Koofr",
 ];
 
+export const DEFAULT_GA_ID = "G-89WN60ZK2E";
 export const PLUGINS = [{ name: "Stable Diffusion", path: Path.Sd }];

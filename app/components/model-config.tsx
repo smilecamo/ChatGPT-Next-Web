@@ -11,7 +11,6 @@ export function ModelConfigList(props: {
   updateConfig: (updater: (config: ModelConfig) => void) => void;
 }) {
   const allModels = useAllModels();
-
   const value = `${props.modelConfig.model}@${props.modelConfig?.providerName}`;
 
   return (
