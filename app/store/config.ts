@@ -51,7 +51,7 @@ export const DEFAULT_CONFIG = {
 
   modelConfig: {
     model: "gpt-3.5-turbo" as ModelType,
-    providerName: "OpenAI" as ServiceProvider,
+    providerName: "DeepSeek" as ServiceProvider,
     temperature: 0.5,
     top_p: 1,
     max_tokens: 4000,

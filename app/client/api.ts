@@ -109,7 +109,7 @@ interface ChatProvider {
 export class ClientApi {
   public llm: LLMApi;
 
-  constructor(provider: ModelProvider = ModelProvider.GPT) {
+  constructor(provider: ModelProvider = ModelProvider.DeepSeek) {
     console.log("init api with provider: ", provider);
 
     switch (provider) {
