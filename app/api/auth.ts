@@ -3,6 +3,7 @@ import { getServerSideConfig } from "../config/server";
 import md5 from "spark-md5";
 import { ACCESS_CODE_PREFIX, ModelProvider } from "../constant";
 
+// 邮箱：
 function getIP(req: NextRequest) {
   let ip = req.ip ?? req.headers.get("x-real-ip");
   const forwardedFor = req.headers.get("x-forwarded-for");
@@ -25,6 +26,8 @@ function parseApiKey(bearToken: string) {
 }
 
 export function auth(req: NextRequest, modelProvider: ModelProvider) {
+  console.log("[Auth] modelProvider", modelProvider);
+
   const authToken = req.headers.get("Authorization") ?? "";
 
   // check if it is openai api key or user token
@@ -65,7 +68,7 @@ export function auth(req: NextRequest, modelProvider: ModelProvider) {
     //     : serverConfig.apiKey;
 
     let systemApiKey: string | undefined;
-
+    console.log("modelProvider", modelProvider);
     switch (modelProvider) {
       case ModelProvider.Stability:
         systemApiKey = serverConfig.stabilityApiKey;
@@ -87,6 +90,9 @@ export function auth(req: NextRequest, modelProvider: ModelProvider) {
         break;
       case ModelProvider.Moonshot:
         systemApiKey = serverConfig.moonshotApiKey;
+        break;
+      case ModelProvider.DeepSeek:
+        systemApiKey = serverConfig.deepseekApiKey;
         break;
       case ModelProvider.Iflytek:
         systemApiKey =

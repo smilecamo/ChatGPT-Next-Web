@@ -47,6 +47,10 @@ const DEFAULT_MOONSHOT_URL = isApp
   ? DEFAULT_API_HOST + "/api/proxy/moonshot"
   : ApiPath.Moonshot;
 
+const DEFAULT_DEEPSEEK_URL = isApp
+  ? DEFAULT_API_HOST + "/api/proxy/deepseek"
+  : ApiPath.DeepSeek;
+
 const DEFAULT_STABILITY_URL = isApp
   ? DEFAULT_API_HOST + "/api/proxy/stability"
   : ApiPath.Stability;
@@ -97,6 +101,9 @@ const DEFAULT_ACCESS_STATE = {
   // moonshot
   moonshotUrl: DEFAULT_MOONSHOT_URL,
   moonshotApiKey: "",
+  // deepseek
+  deepseekUrl: DEFAULT_DEEPSEEK_URL,
+  deepseekApiKey: "",
 
   //stability
   stabilityUrl: DEFAULT_STABILITY_URL,
@@ -166,6 +173,9 @@ export const useAccessStore = createPersistStore(
 
     isValidMoonshot() {
       return ensure(get(), ["moonshotApiKey"]);
+    },
+    isValidDeepseek() {
+      return ensure(get(), ["deepseekApiKey"]);
     },
     isValidIflytek() {
       return ensure(get(), ["iflytekApiKey"]);

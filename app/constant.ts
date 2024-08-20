@@ -22,7 +22,7 @@ export const BAIDU_OATUH_URL = `${BAIDU_BASE_URL}/oauth/2.0/token`;
 export const BYTEDANCE_BASE_URL = "https://ark.cn-beijing.volces.com";
 
 export const ALIBABA_BASE_URL = "https://dashscope.aliyuncs.com/api/";
-
+export const DEEPSEEK_BASE_URL = "https://api.deepseek.com";
 export const TENCENT_BASE_URL = "https://hunyuan.tencentcloudapi.com";
 
 export const MOONSHOT_BASE_URL = "https://api.moonshot.cn";
@@ -54,6 +54,7 @@ export enum ApiPath {
   Alibaba = "/api/alibaba",
   Tencent = "/api/tencent",
   Moonshot = "/api/moonshot",
+  DeepSeek = "/api/deepseek",
   Iflytek = "/api/iflytek",
   Stability = "/api/stability",
   Artifacts = "/api/artifacts",
@@ -110,6 +111,7 @@ export enum ServiceProvider {
   Alibaba = "Alibaba",
   Tencent = "Tencent",
   Moonshot = "Moonshot",
+  DeepSeek = "DeepSeek",
   Stability = "Stability",
   Iflytek = "Iflytek",
 }
@@ -133,6 +135,7 @@ export enum ModelProvider {
   Qwen = "Qwen",
   Hunyuan = "Hunyuan",
   Moonshot = "Moonshot",
+  DeepSeek = "DeepSeek",
   Iflytek = "Iflytek",
 }
 
@@ -209,7 +212,10 @@ export const Moonshot = {
   ExampleEndpoint: MOONSHOT_BASE_URL,
   ChatPath: "v1/chat/completions",
 };
-
+export const DeepSeek = {
+  ExampleEndpoint: DEEPSEEK_BASE_URL,
+  ChatPath: "/v1/chat/completions",
+};
 export const Iflytek = {
   ExampleEndpoint: IFLYTEK_BASE_URL,
   ChatPath: "v1/chat/completions",
@@ -336,6 +342,7 @@ const tencentModels = [
 ];
 
 const moonshotModes = ["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k"];
+const deepseekModes = ["deepseek-chat", "deepseek-coder"];
 
 const iflytekModels = [
   "general",
@@ -444,6 +451,17 @@ export const DEFAULT_MODELS = [
       providerName: "Moonshot",
       providerType: "moonshot",
       sorted: 9,
+    },
+  })),
+  ...deepseekModes.map((name) => ({
+    name,
+    available: true,
+    sorted: seq++,
+    provider: {
+      id: "deepseek",
+      providerName: "DeepSeek",
+      providerType: "DeepSeek",
+      sorted: 11,
     },
   })),
   ...iflytekModels.map((name) => ({

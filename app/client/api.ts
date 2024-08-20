@@ -14,6 +14,7 @@ import { DoubaoApi } from "./platforms/bytedance";
 import { QwenApi } from "./platforms/alibaba";
 import { HunyuanApi } from "./platforms/tencent";
 import { MoonshotApi } from "./platforms/moonshot";
+import { DeepseekApi } from "./platforms/deepseek";
 import { SparkApi } from "./platforms/iflytek";
 
 export const ROLES = ["system", "user", "assistant"] as const;
@@ -109,6 +110,8 @@ export class ClientApi {
   public llm: LLMApi;
 
   constructor(provider: ModelProvider = ModelProvider.GPT) {
+    console.log("init api with provider: ", provider);
+
     switch (provider) {
       case ModelProvider.GeminiPro:
         this.llm = new GeminiProApi();
@@ -130,6 +133,9 @@ export class ClientApi {
         break;
       case ModelProvider.Moonshot:
         this.llm = new MoonshotApi();
+        break;
+      case ModelProvider.DeepSeek:
+        this.llm = new DeepseekApi();
         break;
       case ModelProvider.Iflytek:
         this.llm = new SparkApi();
@@ -217,6 +223,7 @@ export function getHeaders() {
     const isByteDance = modelConfig.providerName === ServiceProvider.ByteDance;
     const isAlibaba = modelConfig.providerName === ServiceProvider.Alibaba;
     const isMoonshot = modelConfig.providerName === ServiceProvider.Moonshot;
+    const isDeepseek = modelConfig.providerName === ServiceProvider.DeepSeek;
     const isIflytek = modelConfig.providerName === ServiceProvider.Iflytek;
     const isEnabledAccessControl = accessStore.enabledAccessControl();
     const apiKey = isGoogle
@@ -231,6 +238,8 @@ export function getHeaders() {
       ? accessStore.alibabaApiKey
       : isMoonshot
       ? accessStore.moonshotApiKey
+      : isDeepseek
+      ? accessStore.deepseekApiKey
       : isIflytek
       ? accessStore.iflytekApiKey && accessStore.iflytekApiSecret
         ? accessStore.iflytekApiKey + ":" + accessStore.iflytekApiSecret
@@ -244,6 +253,7 @@ export function getHeaders() {
       isByteDance,
       isAlibaba,
       isMoonshot,
+      isDeepseek,
       isIflytek,
       apiKey,
       isEnabledAccessControl,
@@ -298,6 +308,8 @@ export function getClientApi(provider: ServiceProvider): ClientApi {
       return new ClientApi(ModelProvider.Hunyuan);
     case ServiceProvider.Moonshot:
       return new ClientApi(ModelProvider.Moonshot);
+    case ServiceProvider.DeepSeek:
+      return new ClientApi(ModelProvider.DeepSeek);
     case ServiceProvider.Iflytek:
       return new ClientApi(ModelProvider.Iflytek);
     default:
